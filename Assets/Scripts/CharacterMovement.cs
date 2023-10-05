@@ -15,6 +15,7 @@ public class CharacterMovement : MonoBehaviour
     private float walkSpeed = 5;
     private float runSpeed = 8;
     private Animator animator;
+    private bool jumped = false;
 
 
     private void Start()
@@ -58,7 +59,6 @@ public class CharacterMovement : MonoBehaviour
 
         if (moveDirection != Vector3.zero)
         {
-            //Vector3 movementDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             float mag = Mathf.Clamp01(moveDirection.magnitude);
             if (!Input.GetKey(KeyCode.LeftShift))
             {
@@ -75,10 +75,12 @@ public class CharacterMovement : MonoBehaviour
         groundedPlayer = controller.isGrounded;
         if (groundedPlayer)
         {
+            animator.SetBool("inAir", false);
             if (Input.GetButtonDown("Jump"))
             {
-                gravity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
                 animator.SetBool("isGrounded", false);
+                gravity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+                jumped = true;
             }
             else
             {
@@ -91,6 +93,13 @@ public class CharacterMovement : MonoBehaviour
             // Since there is no physics applied on character controller we have this applies to reapply gravity
             gravity.y += gravityValue * Time.deltaTime;
             animator.SetBool("isGrounded", true);
+
+            if (Input.GetButtonDown("Jump") && jumped == true)
+            {
+                animator.SetBool("inAir", true);
+                gravity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+                jumped = false;
+            }
         }
         // Apply gravity and move the character
         playerVelocity = gravity * Time.deltaTime + movement;
