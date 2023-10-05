@@ -4,131 +4,107 @@ using UnityEngine;
 
 public class CharacterMovement : MonoBehaviour
 {
-    Vector3 playerVelocity;
-    Vector3 move;
 
-    public float walkSpeed = 5;
-    public float runSpeed = 8;
-    public float jumpHeight = 2;
-    public float gravity = -9.18f;
-    private bool doubleJumped = false;
-
-    private CharacterController controller;
+    public Vector3 gravity;
+    public Vector3 playerVelocity;
+    public bool groundedPlayer;
+    public float mouseSensitivy = 5.0f;
+    private float jumpHeight = 1f;
+    private float gravityValue = -9.81f;
+    public CharacterController controller;
+    private float walkSpeed = 5;
+    private float runSpeed = 8;
     private Animator animator;
+
 
     private void Start()
     {
-        controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
     }
 
     public void Update()
     {
+        UpdateRotation();
         ProcessMovement();
-        ProcessGravity();
+    }
+    void UpdateRotation()
+    {
+        transform.Rotate(0, Input.GetAxis("Mouse X") * mouseSensitivy, 0, Space.Self);
+
     }
 
-    public void LateUpdate()
+    void ProcessMovement()
     {
-        UpdateAnimator();
-    }
+        // Moving the character forward according to the speed
+        float speed = GetMovementSpeed();
 
-    void DisableRootMotion()
-    {
-        animator.applyRootMotion = false;
-    }
+        // Get the camera's forward and right vectors
+        Vector3 cameraForward = Camera.main.transform.forward;
+        Vector3 cameraRight = Camera.main.transform.right;
 
-    void UpdateAnimator()
-    {
-        bool isGrounded = controller.isGrounded;
-        if (move != Vector3.zero)
+        // Make sure to flatten the vectors so that they don't contain any vertical component
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+
+        // Normalize the vectors to ensure consistent speed in all directions
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        // Calculate the movement direction based on input and camera orientation
+        Vector3 moveDirection = (cameraForward * Input.GetAxis("Vertical")) + (cameraRight * Input.GetAxis("Horizontal"));
+
+        // Apply the movement direction and speed
+        Vector3 movement = moveDirection.normalized * speed * Time.deltaTime;
+
+        if (moveDirection != Vector3.zero)
         {
-            if (GetMovementSpeed() == runSpeed)
+            //Vector3 movementDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            float mag = Mathf.Clamp01(moveDirection.magnitude);
+            if (!Input.GetKey(KeyCode.LeftShift))
             {
-                animator.SetFloat("Speed", 1.0f);
+                mag /= 2;
             }
-            else
-            {
-                animator.SetFloat("Speed", 0.5f);
-            }
-
+            animator.SetFloat("Speed", mag);
+            float speed1 = Mathf.Clamp01(moveDirection.magnitude) * 7;
         }
         else
         {
             animator.SetFloat("Speed", 0.0f);
         }
 
-        animator.SetBool("IsGrounded", isGrounded);
-
-        if (Input.GetButtonDown("Fire1"))
+        groundedPlayer = controller.isGrounded;
+        if (groundedPlayer)
         {
-            animator.applyRootMotion = true;
-            animator.SetTrigger("DoRoll");
-        }
-
-    }
-
-    void ProcessMovement()
-    {
-        move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-            animator.SetBool("isWalking", true);
+            if (Input.GetButtonDown("Jump"))
+            {
+                gravity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+                animator.SetBool("isGrounded", false);
+            }
+            else
+            {
+                // Dont apply gravity if grounded and not jumping
+                gravity.y = -1.0f;
+            }
         }
         else
         {
-            animator.SetBool("isWalking", false);
+            // Since there is no physics applied on character controller we have this applies to reapply gravity
+            gravity.y += gravityValue * Time.deltaTime;
+            animator.SetBool("isGrounded", true);
         }
-    }
-
-    public void ProcessGravity()
-    {
-        bool isGrounded = controller.isGrounded;
-        // Since there is no physics applied on character controller we have this applies to reapply gravity
-
-        if (isGrounded)
-        {
-            doubleJumped = false;
-            animator.SetBool("isJumping", false);
-            animator.SetBool("isInTheAir", false);
-            if (playerVelocity.y < 0.0f) // we want to make sure the players stays grounded when on the ground
-            {
-                playerVelocity.y = -1.0f;
-            }
-
-            if (Input.GetButtonDown("Jump")) // Code to jump
-            {
-                playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravity);
-                animator.SetBool("isJumping", true);
-            }
-        }
-        else // if not grounded
-        {
-            playerVelocity.y += gravity * Time.deltaTime;
-            if (Input.GetButtonDown("Jump") && doubleJumped == false) 
-            {
-                doubleJumped = true;
-                playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravity);
-                animator.SetBool("isInTheAir", true);
-                
-            }
-        }
-
-        controller.Move(move * Time.deltaTime * GetMovementSpeed() + playerVelocity * Time.deltaTime);
-
+        // Apply gravity and move the character
+        playerVelocity = gravity * Time.deltaTime + movement;
+        controller.Move(playerVelocity);
     }
 
     float GetMovementSpeed()
     {
         if (Input.GetButton("Fire3"))// Left shift
         {
-            animator.SetBool("isRunning", true);
             return runSpeed;
         }
         else
         {
-            animator.SetBool("isRunning", false);
             return walkSpeed;
         }
     }
