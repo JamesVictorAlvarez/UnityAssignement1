@@ -36,8 +36,8 @@ ModelImporter:
       name: flip
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 33
+      firstFrame: 11.4
+      lastFrame: 31.200003
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

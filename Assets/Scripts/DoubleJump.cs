@@ -11,4 +11,8 @@ public class DoubleJump : MonoBehaviour
         return doubleJump;
     }
 
+    public void DoubleJumpChangeStatus()
+    {
+        doubleJump = !doubleJump;
+    }
 }

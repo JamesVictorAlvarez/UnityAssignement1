@@ -13,8 +13,10 @@ public class BluePickUp : MonoBehaviour
         {
             touched = true;
             BlueParticle.Play();
+            GameManager.instance.DoubleJumpChangeStatus();
             Invoke("Active", 3.0f);
-            Invoke("Respawn", 8.0f);
+            Invoke("Respawn", 30.0f);
+            Invoke("ChangeDoubleJump", 15.0f);
         }
     }
 
@@ -27,5 +29,15 @@ public class BluePickUp : MonoBehaviour
     {
         touched = false;
         gameObject.SetActive(true);
+    }
+
+    // When you pick up a blue power up you only have 15 seconds to use it.
+    private void ChangeDoubleJump()
+    {
+        if (GameManager.instance.GetDoubleJump() == true)
+        {
+            Debug.Log("time's up");
+            GameManager.instance.DoubleJumpChangeStatus();
+        }
     }
 }

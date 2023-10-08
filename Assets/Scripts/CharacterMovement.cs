@@ -21,6 +21,8 @@ public class CharacterMovement : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Update()
@@ -92,14 +94,16 @@ public class CharacterMovement : MonoBehaviour
         {
             // Since there is no physics applied on character controller we have this applies to reapply gravity
             gravity.y += gravityValue * Time.deltaTime;
-            animator.SetBool("isGrounded", true);
-
-            if (Input.GetButtonDown("Jump") && jumped == true)
+            
+            bool allowedDoubleJump = GameManager.instance.GetDoubleJump();
+            if (Input.GetButtonDown("Jump") && jumped == true && allowedDoubleJump == true)
             {
                 animator.SetBool("inAir", true);
+                GameManager.instance.DoubleJumpChangeStatus();
                 gravity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
                 jumped = false;
             }
+            animator.SetBool("isGrounded", true);
         }
         // Apply gravity and move the character
         playerVelocity = gravity * Time.deltaTime + movement;

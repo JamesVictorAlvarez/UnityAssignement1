@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     private ScoreManager scoreManager;
+    private DoubleJump doubleJump;
 
     private void Awake()
     {
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
         }
 
         scoreManager = gameObject.GetComponent<ScoreManager>();
+        doubleJump = gameObject.GetComponent<DoubleJump>();
     }
 
     public int GetScore()
@@ -27,8 +29,18 @@ public class GameManager : MonoBehaviour
         return scoreManager.GetScore();
     }
 
+    public bool GetDoubleJump()
+    {
+        return doubleJump.GetDoubleJump();
+    }
+
     public void IncreseScore()
     {
         scoreManager.IncreaseScore();
+    }
+
+    public void DoubleJumpChangeStatus()
+    {
+        doubleJump.DoubleJumpChangeStatus();
     }
 }
