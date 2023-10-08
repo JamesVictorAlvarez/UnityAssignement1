@@ -11,7 +11,6 @@ public class BluePickUp : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && touched == false)
         {
-            Debug.Log("askdj");
             touched = true;
             BlueParticle.Play();
             Invoke("Active", 3.0f);

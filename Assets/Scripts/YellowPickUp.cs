@@ -10,9 +10,9 @@ public class YellowPickUp : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && touched == false)
         {
-            Debug.Log("asdas");
             touched = true;
             YellowParticle.Play();
+            GameManager.instance.IncreseScore();
             Destroy(gameObject, YellowParticle.main.duration);
         }
     }

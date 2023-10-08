@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    private ScoreManager scoreManager;
 
     private void Awake()
     {
@@ -17,10 +18,17 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
         }
+
+        scoreManager = gameObject.GetComponent<ScoreManager>();
     }
 
-    public void Score()
+    public int GetScore()
     {
+        return scoreManager.GetScore();
+    }
 
+    public void IncreseScore()
+    {
+        scoreManager.IncreaseScore();
     }
 }
