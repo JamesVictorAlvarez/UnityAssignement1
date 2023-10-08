@@ -5,38 +5,27 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    private ScoreManager scoreManager;
     private DoubleJump doubleJump;
+    public int score;
 
     private void Awake()
     {
-        // If there is an instance, and it's not me, delete myself. 
-        if (instance != null && instance != this)
+        if (!instance)
         {
-            Destroy(this);
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            instance = this;
+            //Duplicate GameManager created every time the scene is loaded
+            Destroy(gameObject);
         }
-
-        scoreManager = gameObject.GetComponent<ScoreManager>();
         doubleJump = gameObject.GetComponent<DoubleJump>();
-    }
-
-    public int GetScore()
-    {
-        return scoreManager.GetScore();
     }
 
     public bool GetDoubleJump()
     {
         return doubleJump.GetDoubleJump();
-    }
-
-    public void IncreseScore()
-    {
-        scoreManager.IncreaseScore();
     }
 
     public void DoubleJumpChangeStatus()

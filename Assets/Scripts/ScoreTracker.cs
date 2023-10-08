@@ -7,7 +7,7 @@ public class ScoreTracker : MonoBehaviour
 {
     public Text scoreText;
 
-    int score = 0;
+    int score;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,7 +17,7 @@ public class ScoreTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        score = GameManager.instance.GetScore();
+        score = GameManager.instance.score;
         scoreText.text = score.ToString() + " Points";
     }
 }

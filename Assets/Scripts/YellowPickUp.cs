@@ -12,7 +12,9 @@ public class YellowPickUp : MonoBehaviour
         {
             touched = true;
             YellowParticle.Play();
-            GameManager.instance.IncreseScore();
+            //GameManager.instance.IncreseScore();
+            GameManager.instance.score += 50;
+            Debug.Log(GameManager.instance.score);
             Destroy(gameObject, YellowParticle.main.duration);
         }
     }

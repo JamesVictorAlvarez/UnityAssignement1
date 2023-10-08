@@ -17,6 +17,7 @@ public class MenuManager : MonoBehaviour
 
     public void OnGameRestart()
     {
+        GameManager.instance.score = 0;
         SceneManager.LoadScene(1);
     }
 }
